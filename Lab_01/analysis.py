@@ -1,6 +1,10 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as sns 
+
+
+###################### PLottning ############################
 
 # Hur många är positiva för hjärt-kärlsjukdom och hur många ̈ar negativa?
 def plot_pos_neg(df):
@@ -55,3 +59,24 @@ def plot_men_women (df):
     plt.title('Proportion of women and men who have cardiovascular disease.')
     plt.legend(loc='best', labels=['Male','Female'])
     return plot
+
+
+
+################### Feature_engineering#######################
+def iqr(df, feature,threshold):
+    Q1, Q3 = np.quantile(df[feature], 0.25), np.quantile(df[feature], 0.75)
+    IQR = Q3 - Q1
+    return df[(df[feature] >= Q1 - threshold * IQR) & ( df[feature] <= Q3 + threshold * IQR)]
+
+
+# bmi
+def bmi(df):
+    df['bmi'] = round(np.divide(df['weight'],np.power(df['height']*0.01,2)))
+    return df['bmi']
+
+
+# bmi category
+def bmi_cat(df):
+    df['bmi_cat'] = pd.cut(x=df['bmi'], bins=[18.5,25,30,35,40,99],
+                         labels = ['normal range', 'over-weight', 'obese (class 1)','obese (class 2)', 'obese (class 3)'])
+    return df['bmi_cat'] 
