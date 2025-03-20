@@ -60,7 +60,12 @@ def plot_men_women (df):
     plt.legend(loc='best', labels=['Male','Female'])
     return plot
 
-
+# Heatmap av korrelatione
+def plot_heat(df):
+    df = pd.get_dummies(df, drop_first=True)
+    plt.figure(figsize=(10,8))
+    plot = sns.heatmap(df.corr(), annot=True, annot_kws={'size':8}, fmt= '.2f', cmap='coolwarm', linewidths=0.5)
+    return plot
 
 ################### Feature_engineering#######################
 def iqr(df, feature,threshold):
@@ -79,4 +84,25 @@ def bmi(df):
 def bmi_cat(df):
     df['bmi_cat'] = pd.cut(x=df['bmi'], bins=[18.5,25,30,35,40,99],
                          labels = ['normal range', 'over-weight', 'obese (class 1)','obese (class 2)', 'obese (class 3)'])
-    return df['bmi_cat'] 
+    return df
+
+# blood pressure category (medium.com)
+def pressure_cat(df):
+    
+    conditions = [
+        ((df['ap_hi'] <= 120) & (df['ap_lo'] <= 80)),
+        ((df['ap_hi'] > 120) & (df['ap_hi'] <= 129)) & ((df['ap_lo'] >= 60) & (df['ap_lo'] <= 80)),
+        ((df['ap_hi'] >= 130) & (df['ap_hi'] <= 139)) | ((df['ap_lo'] > 80) & (df['ap_lo'] <= 89)),
+        ((df['ap_hi'] >= 140) & (df['ap_hi'] <= 179)) | ((df['ap_lo'] >= 90) & (df['ap_lo'] <= 119)),
+        ((df['ap_hi'] >= 180) | (df['ap_lo'] >= 120))  
+    ]
+    choices = [
+        'Healthy', 
+        'Elevated', 
+        'Stage 1 hypertension', 
+        'Stage 2 hypertension', 
+        'Hypertension crysis']
+    
+    df['pressure_cat'] = np.select(conditions, choices, default='Unknown')
+       
+    return df
