@@ -67,8 +67,31 @@ def plot_heat(df):
     plot = sns.heatmap(df.corr(), annot=True, annot_kws={'size':8}, fmt= '.2f', cmap='coolwarm', linewidths=0.5)
     return plot
 
+# Visualiseringar andel sjukdomar
+def vis_disease(df):
+    fig, axes = plt.subplots(3, 2, dpi=100, figsize=(12, 14))
+    axes = axes.flatten()
+
+    df_h=df.copy()
+    df_h['cholesterol']=df_h['cholesterol'].replace({1:'Normal', 2:'Above normal', 3:'Well above normal'})
+    df_h['gluc']=df_h['gluc'].replace({1:'Normal', 2:'Above normal', 3:'Well above normal'})
+    df_h['alco']=df_h['alco'].replace({1:'Alcohol Consumer', 0:'Non-Alcohol Consumer'})
+    df_h['smoke']=df_h['smoke'].replace({1:'Smoker', 0:'Non-Smoker'})
+    hues = ['bmi_cat', 'pressure_cat', 'cholesterol','gluc', 'alco', 'smoke']
+    titles = ['BMI Categories', 'Pressure Categories', 'Cholesterol Levels', 
+              'Glucose levels', 'Alcohol Consumption', 'Smoke Status']
+
+    for i, (hue, title) in enumerate(zip(hues, titles)):
+       fig = sns.countplot(df_h[df_h['cardio']==1], x='cardio', hue=hue, ax=axes[i])
+       axes[i].set_ylabel('Count', fontsize = 10)
+       axes[i].set_title(f"Distribution of {title} in \n Patients With Cardiovascular Disease. ", fontsize=13)
+       axes[i].get_legend().set_title('')
+    plt.tight_layout()
+    plt.show()
+    return fig
+
 ################### Feature_engineering#######################
-def iqr(df, feature,threshold):
+def iqr(df, feature, threshold):
     Q1, Q3 = np.quantile(df[feature], 0.25), np.quantile(df[feature], 0.75)
     IQR = Q3 - Q1
     return df[(df[feature] >= Q1 - threshold * IQR) & ( df[feature] <= Q3 + threshold * IQR)]
@@ -83,7 +106,7 @@ def bmi(df):
 # bmi category
 def bmi_cat(df):
     df['bmi_cat'] = pd.cut(x=df['bmi'], bins=[18.5,25,30,35,40,99],
-                         labels = ['normal range', 'over-weight', 'obese (class 1)','obese (class 2)', 'obese (class 3)'])
+                         labels = ['Normal range', 'Over-weight', 'Obese (class 1)','Obese (class 2)', 'Obese (class 3)'])
     return df
 
 # blood pressure category (medium.com)
