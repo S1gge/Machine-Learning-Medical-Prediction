@@ -6,66 +6,48 @@ import seaborn as sns
 
 ###################### PLottning ############################
 
-# Hur många är positiva för hjärt-kärlsjukdom och hur många ̈ar negativa?
-def plot_pos_neg(df):
-    plot = plt.pie(df['cardio'].value_counts(), autopct='%1.2f%%',  explode=[0.1,0], shadow=True)
-    plt.title('Proportion of people who tests positive or negative for \n cardiovascualr disease.')
-    plt.legend(loc='best', labels=['Negative', 'Positive'])
-    return plot
+# plt.pie cardio, cholesterol, smoke, height
+def eda_pie(df):
+    fig,axs = plt.subplots(2, 2, figsize = (12,14))
 
-# Hur stor andel har normala, ̈over normala och långt ̈over normala kolesterolvärden?
-def plot_cholesterol (df):
-    plot = plt.pie(df['cholesterol'].value_counts(),  autopct='%1.2f%%', explode=[0.04,0.1,0.1], shadow=True)
-    plt.title('Proportion of people who have normal, above normal and well \n above normal cholesterol levels.')
-    plt.legend(loc='best', labels=['Normal','Above normal', 'Well above normal'])
-    return plot
+    axs[0,0].pie(df['cardio'].value_counts(), autopct='%1.2f%%',  explode=[0.1,0], shadow=True)
+    axs[0,0].set_title('Proportion of people who tests positive or negative for \n cardiovascualr disease.')
+    axs[0,0].legend(loc='best', labels=['Negative', 'Positive'])
 
-# Hur ser ålders fördelningen ut?
-def plot_age(df):
-    fig, ax = plt.figure(figsize=(6,4), dpi=100), plt.axes()
-    plot = sns.histplot(data=[a/365 for a in df['age']])
-    ax.set(xlabel='Age, years')
-    plt.title('Age distribution.')
-    return plot
+    axs[0,1].pie(df['cholesterol'].value_counts(),  autopct='%1.2f%%', explode=[0.04,0.1,0.1], shadow=True)
+    axs[0,1].set_title('Proportion of people who have normal, above normal and well \n above normal cholesterol levels.')
+    axs[0,1].legend(loc='best', labels=['Normal','Above normal', 'Well above normal'])
 
-# Hur stor andel röker?
-def plot_smoke(df):
-    plot = plt.pie(df['smoke'].value_counts(), autopct='%1.2f%%', explode=[0.2,0], shadow=True)
-    plt.title('Proportion of people who smoke or not.')
-    plt.legend(loc='best', labels=["Don't smoke","Smoke"])
-    return plot
+    axs[1,0].pie(df['smoke'].value_counts(), autopct='%1.2f%%', explode=[0.2,0], shadow=True)
+    axs[1,0].set_title('Proportion of people who smoke or not.')
+    axs[1,0].legend(loc='best', labels=["Don't smoke","Smoke"])
 
-# Hur ser vikt fördelningen ut?
-def plot_weight(df):
-    fig, ax = plt.figure(figsize=(6,4), dpi=100), plt.axes()
-    plot = sns.histplot(data=df['weight'], bins=80)
-    plt.title('Weight destripution.')
-    ax.set(xlabel='Weight, kg')
-    return plot
+    axs[1,1].pie(df[df['cardio']==1]['gender'].value_counts(), autopct='%1.2f%%', explode=[0.1,0], shadow=True)
+    axs[1,1].set_title('Proportion of women and men who have cardiovascular disease.')
+    axs[1,1].legend(loc='best', labels=['Male','Female'])
 
-# Hur ser längd fördelningen ut?
-def plot_height(df):
-    fig, ax = plt.figure(figsize=(6,4), dpi=100), plt.axes()
-    plot = sns.histplot(data=df['height'], bins=80)
-    ax.set(xlabel='Height (cm)')
-    plt.title('Height distribution.')
-    return plot
+    return
 
-# Hur stor andel av kvinnor respektive män har hjärt-kärl sjukdom
-def plot_men_women (df):
-    df_pos = df[df['cardio']==1]
-    df_pos_g = df_pos['gender'].value_counts()
-    plot = plt.pie(df_pos_g, autopct='%1.2f%%', explode=[0.1,0], shadow=True)
-    plt.title('Proportion of women and men who have cardiovascular disease.')
-    plt.legend(loc='best', labels=['Male','Female'])
-    return plot
+# histplot age, weight, height
+def eda_hist(df):
+    fig,axs = plt.subplots(3,1, figsize = (10,10))
 
-# Heatmap av korrelatione
-def plot_heat(df):
-    df = pd.get_dummies(df, drop_first=True)
-    plt.figure(figsize=(10,8))
-    plot = sns.heatmap(df.corr(), annot=True, annot_kws={'size':8}, fmt= '.2f', cmap='coolwarm', linewidths=0.5)
-    return plot
+    sns.histplot(data=[a/365 for a in df['age']], bins=30, ax=axs[0])
+    axs[0].set_title('Age distribution.')
+    axs[0].set_xlabel('Age, years.')
+
+    sns.histplot(data=df['weight'], bins=30, ax=axs[1])
+    axs[1].set_title('Weight destripution.')
+    axs[1].set_xlabel('Weight, kg')
+
+    sns.histplot(data=df['height'], bins=30, ax=axs[2])
+    axs[2].set_title('Height distribution.')
+    axs[2].set_xlabel('Height, cm.')
+
+    plt.tight_layout()
+
+    return
+
 
 # Visualiseringar andel sjukdomar
 def vis_disease(df):
@@ -82,13 +64,22 @@ def vis_disease(df):
               'Glucose levels', 'Alcohol Consumption', 'Smoke Status']
 
     for i, (hue, title) in enumerate(zip(hues, titles)):
-       fig = sns.countplot(df_h[df_h['cardio']==1], x='cardio', hue=hue, ax=axes[i])
+       plot = sns.countplot(df_h[df_h['cardio']==1], x='cardio', hue=hue, ax=axes[i])
        axes[i].set_ylabel('Count', fontsize = 10)
        axes[i].set_title(f"Distribution of {title} in \n Patients With Cardiovascular Disease. ", fontsize=13)
        axes[i].get_legend().set_title('')
     plt.tight_layout()
     plt.show()
-    return fig
+    return plot
+
+# Heatmap av korrelatione
+def plot_heat(df):
+    df = pd.get_dummies(df, drop_first=True)
+    plt.figure(figsize=(10,8))
+    plot = sns.heatmap(df.corr(), annot=True, annot_kws={'size':8}, fmt= '.2f', cmap='coolwarm', linewidths=0.5)
+    return plot
+
+
 
 ################### Feature_engineering#######################
 def iqr(df, feature, threshold):
