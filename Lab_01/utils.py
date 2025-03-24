@@ -7,7 +7,7 @@ import seaborn as sns
 ###################### PLottning ############################
 
 # plt.pie cardio, cholesterol, smoke, height
-def eda_pie(df):
+def eda_pieplot(df):
     fig,axs = plt.subplots(2, 2, figsize = (12,14))
 
     axs[0,0].pie(df['cardio'].value_counts(), autopct='%1.2f%%',  explode=[0.1,0], shadow=True)
@@ -29,7 +29,7 @@ def eda_pie(df):
     return
 
 # histplot age, weight, height
-def eda_hist(df):
+def eda_histplot(df):
     fig,axs = plt.subplots(3,1, figsize = (10,10))
 
     sns.histplot(data=[a/365 for a in df['age']], bins=30, ax=axs[0])
@@ -50,7 +50,7 @@ def eda_hist(df):
 
 
 # Visualiseringar andel sjukdomar
-def vis_disease(df):
+def plot_disease(df):
     fig, axes = plt.subplots(3, 2, dpi=100, figsize=(12, 14))
     axes = axes.flatten()
 
