@@ -19,10 +19,11 @@ def eda_pieplot(df):
               ['Normal','Above normal', 'Well above normal'],
               ["Don't smoke","Smoke"],
               ['Male','Female']]
-    features =['cardio', 'cholesterol', 'smoke', 'cardio'==1]
-    for i, (title, label, feature) in enumerate(zip(titles, labels, features)):
+    features = [df['cardio'], df['cholesterol'], df['smoke'], df[df['cardio'] == 1]['gender']]
+    explodes = [[0.1, 0], [0.1, 0.1, 0.1], [0.1, 0.1], [0.1, 0]]
+    for i, (title, label, feature, explode) in enumerate(zip(titles, labels, features, explodes)):
 
-        plot = axes[i].pie(df['cardio'].value_counts(), autopct='%1.2f%%',  explode=[0.1,0], shadow=True)
+        plot = axes[i].pie(feature.value_counts(), autopct='%1.2f%%',  explode=explode, shadow=True)
         axes[i].set_title(title)
         axes[i].legend(loc='best', labels=label)
 
@@ -34,12 +35,13 @@ def eda_histplot(df):
     fig,axes = plt.subplots(3,1, figsize = (10,10))
     axes = axes.flatten()
 
-    titles = ['Age distribution.', 'Weight destripution.', 'Height distribution.']
+    data = [[a/365 for a in df['age']],df['weight'], df['height']]
+    titles = ['Age distribution.', 'Weight destribution.', 'Height distribution.']
     labels = ['Age, years.', 'Weight, kg', 'Height, cm.']
     
-    for i, (title, label) in enumerate(zip(titles, labels)):
+    for i, (data, title, label) in enumerate(zip(data, titles, labels)):
 
-        plot=sns.histplot(data=[a/365 for a in df['age']], bins=30, ax=axes[i])
+        plot=sns.histplot(data=data, bins=60, ax=axes[i])
         axes[i].set_title(title)
         axes[i].set_xlabel(label)
 
@@ -102,7 +104,6 @@ def bmi_cat(df):
 
 # blood pressure category (medium.com)
 def pressure_cat(df):
-    
     conditions = [
         ((df['ap_hi'] <= 120) & (df['ap_lo'] <= 80)),
         ((df['ap_hi'] > 120) & (df['ap_hi'] <= 129)) & ((df['ap_lo'] >= 60) & (df['ap_lo'] <= 80)),
