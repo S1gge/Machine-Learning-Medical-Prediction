@@ -67,7 +67,7 @@ class Disease_Prediction:
              ]
 
         classifier = self.grid_search(LogisticRegression(), X_train_scale, y_train, param_grid, cv=5)
-        self.evaluate(classifier, X_val_scale, y_val, show_class_report = True, conf_matrix=False)
+        self.evaluate(classifier, X_val_scale, y_val, show_class_report = False, conf_matrix=False)
 
         print(f'Logistic Regression Best Recall:: {classifier.best_score_}')
         log_reg_best_model = classifier.best_estimator_
@@ -82,7 +82,7 @@ class Disease_Prediction:
                       'metric': ['euclidean', 'manhattan', 'minkowski']}
                       ]
         classifier = self.grid_search(KNeighborsClassifier(),X_train_scale, y_train, param_grid, cv=5)
-        self.evaluate(classifier, X_val_scale, y_val, show_class_report = True, conf_matrix=False)
+        self.evaluate(classifier, X_val_scale, y_val, show_class_report = False, conf_matrix=False)
 
         print(f'KNeighborgs Best Recall:: {classifier.best_score_}')
         knn_best_model = classifier.best_estimator_
@@ -93,15 +93,15 @@ class Disease_Prediction:
         X_train_scale, X_val_scale, X_test_scale = self.scaling(X_train, X_val, X_test)
         
         param_grid = [
-            {"n_estimators": [200],
+            {"n_estimators": [100, 150, 200, 300],
              "max_depth" : [None],
-             "criterion": ["gini"],
+             "criterion": ["gini", "entropy"],
              "max_leaf_nodes": [6],
-             "max_features":["log2"]}
+             "max_features":["auto","sqrt", "log2"]}
             ]
         
         classifier = self.grid_search(RandomForestClassifier(), X_train_scale, y_train, param_grid, cv=5)
-        self.evaluate(classifier, X_val_scale, y_val, show_class_report = True, conf_matrix=False)
+        self.evaluate(classifier, X_val_scale, y_val, show_class_report = False, conf_matrix=False)
 
         print(f'Random Forest Best Recall:: {classifier.best_score_}')
         random_forest_best_model = classifier.best_estimator_
