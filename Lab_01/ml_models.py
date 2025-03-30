@@ -66,12 +66,12 @@ class Disease_Prediction:
              'max_iter': [1000]}
              ]
 
+        print(f'*** Logistic Regression Report ***')
         classifier = self.grid_search(LogisticRegression(), X_train_scale, y_train, param_grid, cv=5)
-        self.evaluate(classifier, X_val_scale, y_val, show_class_report = False, conf_matrix=False)
+        self.evaluate(classifier, X_val_scale, y_val, show_class_report = True, conf_matrix=False)
 
-        print(f'Logistic Regression Best Recall:: {classifier.best_score_}')
-        log_reg_best_model = classifier.best_estimator_
-        return log_reg_best_model
+        self.log_reg_best_model = classifier.best_estimator_
+        return self.log_reg_best_model
 
 
     def knn(self):
@@ -81,12 +81,13 @@ class Disease_Prediction:
                       'weights': ['uniform', 'distance'],
                       'metric': ['euclidean', 'manhattan', 'minkowski']}
                       ]
+        
+        print(f'*** KNeighborgs Report ***')
         classifier = self.grid_search(KNeighborsClassifier(),X_train_scale, y_train, param_grid, cv=5)
-        self.evaluate(classifier, X_val_scale, y_val, show_class_report = False, conf_matrix=False)
+        self.evaluate(classifier, X_val_scale, y_val, show_class_report = True, conf_matrix=False)
 
-        print(f'KNeighborgs Best Recall:: {classifier.best_score_}')
-        knn_best_model = classifier.best_estimator_
-        return knn_best_model
+        self.knn_best_model = classifier.best_estimator_
+        return self.knn_best_model
     
     def random_forest(self):
         X_train, X_val, X_test, y_train, y_val, y_test = self.split_data()
@@ -97,23 +98,23 @@ class Disease_Prediction:
              "max_depth" : [None],
              "criterion": ["gini", "entropy"],
              "max_leaf_nodes": [6],
-             "max_features":["auto","sqrt", "log2"]}
+             "max_features":["sqrt", "log2"]}
             ]
         
+        print(f'*** Random Forest report ***')
         classifier = self.grid_search(RandomForestClassifier(), X_train_scale, y_train, param_grid, cv=5)
-        self.evaluate(classifier, X_val_scale, y_val, show_class_report = False, conf_matrix=False)
+        self.evaluate(classifier, X_val_scale, y_val, show_class_report = True, conf_matrix=False)
 
-        print(f'Random Forest Best Recall:: {classifier.best_score_}')
-        random_forest_best_model = classifier.best_estimator_
-        return random_forest_best_model
+        self.random_forest_best_model = classifier.best_estimator_
+        return self.random_forest_best_model
     
     def voting_clf(self):
         X_train, X_val, X_test, y_train, y_val, y_test = self.split_data()
         X_train_scale, X_val_scale, X_test_scale = self.scaling(X_train, X_val, X_test)
 
-        log_reg = self.log_reg()
-        knn = self.knn()
-        random_forest = self.random_forest()
+        log_reg = self.log_reg_best_model
+        knn = self.knn_best_model
+        random_forest = self.random_forest_best_model
 
         vote_clf = VotingClassifier(
             [('log_reg',log_reg),
@@ -129,8 +130,6 @@ class Disease_Prediction:
     def test(self, model):
         X_train, X_val, X_test, y_train, y_val, y_test = self.split_data()
         X_train_scale, X_val_scale, X_test_scale = self.scaling(X_train, X_val, X_test)
-
-        model = model
 
         X_train=np.concatenate((X_train_scale,X_val_scale))
         y_train=np.concatenate((y_train,y_val))
